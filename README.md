@@ -9,9 +9,9 @@ Cafe menu (FastAPI, SQLAlchemy, uvicorn)
   ### 1. Создание базы: 
   
      python create_db.py
-     ```
+
   ### 2. Запуск сервера:
-     ```
+
      uvicorn main:app --reload
-     ```
+
   ### 3. Тестируем в Postman.
