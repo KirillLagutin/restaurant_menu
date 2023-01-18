@@ -1,6 +1,7 @@
 from fastapi import FastAPI, status, HTTPException
 from src.db.database import SessionLocal
 from src.schemas.schemas import MenuBase, SubmenuBase, DishBase
+from typing import List
 from uuid import UUID
 import uuid
 from src.models.models import Menu, Submenu, Dish
@@ -18,7 +19,7 @@ URI = '/api/v1/menus'
 # Get All Menus
 # --------------------------------------------------------------------
 @app.get(URI,
-         response_model=list[MenuBase],
+         response_model=List[MenuBase],
          status_code=status.HTTP_200_OK)
 def get_all_menus():
     menus = db.query(Menu).all()
@@ -122,7 +123,7 @@ def delete_menu(menu_id: UUID):
 # Get All Submenus
 # --------------------------------------------------------------------
 @app.get(URI + '/{menu_id}/submenus',
-         response_model=list[SubmenuBase],
+         response_model=List[SubmenuBase],
          status_code=status.HTTP_200_OK)
 def get_all_submenus():
     submenus = db.query(Submenu).all()
@@ -220,7 +221,7 @@ def delete_submenu(submenu_id: UUID):
 # Get All Dishes
 # --------------------------------------------------------------------
 @app.get(URI + '/{menu_id}/submenus/{submenu_id}/dishes',
-         response_model=list[DishBase],
+         response_model=List[DishBase],
          status_code=status.HTTP_200_OK)
 def get_all_dishes():
     dishes = db.query(Dish).all()
