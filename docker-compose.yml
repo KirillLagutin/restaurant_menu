@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  app:
+    container_name: app
+    build: ./src
+    environment:
+      - DATABASE_URL=postgresql://user_db_menu:password_db_menu@db/name_db_menu
+    entrypoint: >
+      bash -c "
+      echo 'Starting project...' &&
+      uvicorn app.main:app --host 0.0.0.0 --reload"
+    volumes:
+      - ./src/:/app/src/
+    networks:
+      - app_network
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: db_postgres
+    image: postgres:15.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=user_db_menu
+      - POSTGRES_PASSWORD=password_db_menu
+      - POSTGRES_DB=name_db_menu
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", " netstat -an | grep -q 5432" ]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    name: app_network

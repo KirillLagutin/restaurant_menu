@@ -1,4 +1,4 @@
-from src.db.database import Base
+from app.db.database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import String, Float, Column, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
