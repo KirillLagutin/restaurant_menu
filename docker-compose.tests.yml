@@ -4,13 +4,16 @@ services:
 
   test_app:
     container_name: test_app
-    build: ./src
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: "pytest -vv"
     environment:
       - DATABASE_URL=postgresql://user_db:password_db@db/name_db
-#    networks:
-#      - app_network
-#
-#networks:
-#  app_network:
-#    name: app_network
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    external:
+      name: app_network

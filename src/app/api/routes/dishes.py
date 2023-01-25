@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from app.api.schemas import DishBase, DishDb
-from app.db.models import Base, Submenu, Dish
-from app.db.database import db, engine
+from src.app.api.schemas import DishBase, DishDb
+from src.app.db.models import Base, Submenu, Dish
+from src.app.db.database import db, engine
 from uuid import UUID
 
 Base.metadata.create_all(bind=engine)

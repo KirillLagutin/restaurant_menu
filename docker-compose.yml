@@ -4,15 +4,17 @@ services:
 
   server:
     container_name: server
-    build: ./src
+    build:
+      context: .
+      dockerfile: Dockerfile
     entrypoint: >
       bash -c "
         echo 'Starting project...' &&
         while !</dev/tcp/db/5432; do sleep 1; done &&
-        uvicorn app.main:app --reload --workers 1 --host 0.0.0.0
+        uvicorn src.main:app --reload --workers 1 --host 0.0.0.0
       "
     volumes:
-      - ./src/:/usr/src/app/
+      - ./src/:/app/src/
     environment:
       - DATABASE_URL=postgresql://user_db:password_db@db/name_db
     networks:
