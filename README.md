@@ -1,5 +1,5 @@
 # Тестовое задание для Ylab
-## Меню для кафе (FastAPI, SQLAlchemy, uvicorn)
+## Меню для ресторана (FastAPI, SQLAlchemy, uvicorn)
 
 
 ### Описание шагов по запуску проекта
