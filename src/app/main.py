@@ -3,6 +3,12 @@ from app.api.routes import menus, submenus, dishes
 
 app = FastAPI()
 
+
+@app.get("/ping")
+def pong():
+    return {"ping": "pong!"}
+
+
 app.include_router(
     menus.router,
     prefix="/api/v1/menus",
