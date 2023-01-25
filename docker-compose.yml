@@ -2,43 +2,37 @@ version: '3.8'
 
 services:
 
-  app:
-    container_name: app
+  server:
+    container_name: server
     build: ./src
-    environment:
-      - DATABASE_URL=postgresql://user_db_menu:password_db_menu@db/name_db_menu
     entrypoint: >
       bash -c "
-      echo 'Starting project...' &&
-      uvicorn app.main:app --host 0.0.0.0 --reload"
+        echo 'Starting project...' &&
+        while !</dev/tcp/db/5432; do sleep 1; done &&
+        uvicorn app.main:app --reload --workers 1 --host 0.0.0.0
+      "
     volumes:
-      - ./src/:/app/src/
+      - ./src/:/usr/src/app/
+    environment:
+      - DATABASE_URL=postgresql://user_db:password_db@db/name_db
     networks:
       - app_network
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
 
   db:
-    container_name: db_postgres
+    container_name: db
     image: postgres:15.1-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    expose:
-      - 5432
     environment:
-      - POSTGRES_USER=user_db_menu
-      - POSTGRES_PASSWORD=password_db_menu
-      - POSTGRES_DB=name_db_menu
+      - POSTGRES_USER=user_db
+      - POSTGRES_PASSWORD=password_db
+      - POSTGRES_DB=name_db
     networks:
       - app_network
-    healthcheck:
-      test: [ "CMD-SHELL", " netstat -an | grep -q 5432" ]
-      interval: 3s
-      timeout: 5s
-      retries: 5
+    expose:
+      - 5432
 
 volumes:
   postgres_data:
@@ -46,3 +40,6 @@ volumes:
 networks:
   app_network:
     name: app_network
+
+### Вместо 'depends_on:' использую в 'entrypoint:' (или command:) проверку
+### while !</dev/tcp/db/5432; do sleep 1; done

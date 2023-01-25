@@ -1,18 +1,18 @@
 from fastapi import APIRouter, HTTPException, status
-from app.api.schemas import MenuBase, SubmenuBase, DishBase
-from app.db.models import Menu, Submenu, Dish
-from main import db
+from app.api.schemas import DishBase, DishDb
+from app.db.models import Base, Submenu, Dish
+from app.db.database import db, engine
 from uuid import UUID
-import uuid
+
+Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
 
 # Get All Dishes
 # --------------------------------------------------------------------
-# @app.get(URI + '/{menu_id}/submenus/{submenu_id}/dishes',
 @router.get('/',
-            response_model=list[DishBase],
+            response_model=list[DishDb],
             status_code=status.HTTP_200_OK)
 def get_all_dishes():
     dishes = db.query(Dish).all()
@@ -27,11 +27,16 @@ def get_all_dishes():
 # Create Dish
 # --------------------------------------------------------------------
 @router.post('/',
-             response_model=DishBase,
+             response_model=DishDb,
              status_code=status.HTTP_201_CREATED)
 def create_dish(submenu_id: UUID, dish: DishBase):
+    submenu = db.query(Submenu).get(submenu_id)
+
+    if submenu is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"no submenu with id: {submenu_id}")
+
     new_dish = Dish(
-        id=uuid.uuid4(),
         title=dish.title,
         description=dish.description,
         price=dish.price,
@@ -47,9 +52,8 @@ def create_dish(submenu_id: UUID, dish: DishBase):
 
 # Get Dish
 # --------------------------------------------------------------------
-# @app.get(URI + '/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
 @router.get('/{dish_id}',
-            response_model=DishBase,
+            response_model=DishDb,
             status_code=status.HTTP_200_OK)
 def get_dish(dish_id: UUID):
     dish = db.query(Dish).get(dish_id)
@@ -66,7 +70,7 @@ def get_dish(dish_id: UUID):
 # Update Dish
 # --------------------------------------------------------------------
 @router.patch('/{dish_id}',
-              response_model=DishBase,
+              response_model=DishDb,
               status_code=status.HTTP_200_OK)
 def update_dish(dish_id: UUID, dish: DishBase):
     dish_update = db.query(Dish).get(dish_id)
@@ -80,6 +84,7 @@ def update_dish(dish_id: UUID, dish: DishBase):
     dish_update.price = dish.price
 
     db.commit()
+    db.refresh(dish_update)
 
     return dish_update
 

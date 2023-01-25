@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
-from app.api.schemas import MenuBase, SubmenuBase, DishBase
-from app.db.models import Menu, Submenu, Dish
-from main import db
+from app.api.schemas import MenuBase, MenuDb
+from app.db.models import Base, Menu, Submenu, Dish
+from app.db.database import db, engine
 from uuid import UUID
-import uuid
+
+Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
@@ -11,7 +12,7 @@ router = APIRouter()
 # Get All Menus
 # --------------------------------------------------------------------
 @router.get('/',
-            response_model=list[MenuBase],
+            response_model=list[MenuDb],
             status_code=status.HTTP_200_OK)
 def get_all_menus():
     menus = db.query(Menu).all()
@@ -30,11 +31,10 @@ def get_all_menus():
 # Create Menu
 # --------------------------------------------------------------------
 @router.post('/',
-             response_model=MenuBase,
+             response_model=MenuDb,
              status_code=status.HTTP_201_CREATED)
 def create_menu(menu: MenuBase):
     new_menu = Menu(
-        id=uuid.uuid4(),
         title=menu.title,
         description=menu.description,
     )
@@ -49,7 +49,7 @@ def create_menu(menu: MenuBase):
 # Get Menu
 # --------------------------------------------------------------------
 @router.get('/{menu_id}',
-            response_model=MenuBase,
+            response_model=MenuDb,
             status_code=status.HTTP_200_OK)
 def get_menu(menu_id: UUID):
     menu = db.query(Menu).get(menu_id)
@@ -71,12 +71,12 @@ def get_menu(menu_id: UUID):
 # Update Menu
 # --------------------------------------------------------------------
 @router.patch('/{menu_id}',
-              response_model=MenuBase,
+              response_model=MenuDb,
               status_code=status.HTTP_200_OK)
 def update_menu(menu_id: UUID, menu: MenuBase):
     menu_update = db.query(Menu).get(menu_id)
 
-    if menu_id is None:
+    if menu_update is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="menu not found")
 
@@ -84,8 +84,9 @@ def update_menu(menu_id: UUID, menu: MenuBase):
     menu_update.description = menu.description
 
     db.commit()
+    db.refresh(menu_update)
 
-    return menu
+    return menu_update
 
 
 # Delete Menu

@@ -1,18 +1,18 @@
 from fastapi import APIRouter, HTTPException, status
-from app.api.schemas import MenuBase, SubmenuBase, DishBase
-from app.db.models import Menu, Submenu, Dish
-from main import db
+from app.api.schemas import SubmenuBase, SubmenuDb
+from app.db.models import Base, Menu, Submenu, Dish
+from app.db.database import db, engine
 from uuid import UUID
-import uuid
+
+Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
 
 # Get All Submenus
 # --------------------------------------------------------------------
-# @app.get(URI + '/{menu_id}/submenus',
 @router.get('/',
-            response_model=list[SubmenuBase],
+            response_model=list[SubmenuDb],
             status_code=status.HTTP_200_OK)
 def get_all_submenus():
     submenus = db.query(Submenu).all()
@@ -27,11 +27,16 @@ def get_all_submenus():
 # Create Submenu
 # --------------------------------------------------------------------
 @router.post('/',
-             response_model=SubmenuBase,
+             response_model=SubmenuDb,
              status_code=status.HTTP_201_CREATED)
 def create_submenu(menu_id: UUID, submenu: SubmenuBase):
+    menu = db.query(Menu).get(menu_id)
+
+    if menu is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"no menu with id: {menu_id}")
+
     new_submenu = Submenu(
-        id=uuid.uuid4(),
         title=submenu.title,
         description=submenu.description,
         menu_id=menu_id
@@ -46,9 +51,8 @@ def create_submenu(menu_id: UUID, submenu: SubmenuBase):
 
 # Get Submenu
 # --------------------------------------------------------------------
-# @app.get(URI + '/{menu_id}/submenus/{submenu_id}',
 @router.get('/{submenu_id}',
-            response_model=SubmenuBase,
+            response_model=SubmenuDb,
             status_code=status.HTTP_200_OK)
 def get_submenu(submenu_id: UUID):
     submenu = db.query(Submenu).get(submenu_id)
@@ -67,12 +71,12 @@ def get_submenu(submenu_id: UUID):
 # Update Submenu
 # --------------------------------------------------------------------
 @router.patch('/{submenu_id}',
-              response_model=SubmenuBase,
+              response_model=SubmenuDb,
               status_code=status.HTTP_200_OK)
 def update_submenu(submenu_id: UUID, submenu: SubmenuBase):
     submenu_update = db.query(Submenu).get(submenu_id)
 
-    if submenu_id is None:
+    if submenu_update is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="submenu not found")
 
@@ -80,8 +84,9 @@ def update_submenu(submenu_id: UUID, submenu: SubmenuBase):
     submenu_update.description = submenu.description
 
     db.commit()
+    db.refresh(submenu_update)
 
-    return submenu
+    return submenu_update
 
 
 # Delete Submenu
