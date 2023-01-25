@@ -8,3 +8,7 @@
       docker compose up -d
       
 ...  или кнопкой в PyCharm
+
+  ### 2. Тестируем API в постмане. Или в свагере: 
+  
+      [Swager](http://localhost:8000/docs)
