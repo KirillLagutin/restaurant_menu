@@ -11,4 +11,4 @@
 
   ### 2. Тестируем API в постмане. Или в свагере: 
   
-      [Swager](http://localhost:8000/docs)
+  [Swager](http://localhost:8000/docs)
