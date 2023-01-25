@@ -9,8 +9,7 @@
       
 ...  или кнопкой в PyCharm
 
-  ### 2. Тестируем API в постмане. Или в свагере: 
+  ### 2. Тестируем API в Postman. Или в [Swagger](http://localhost:8000/docs): 
   
       localhost:8000/docs
-  
-  [Swager](http://localhost:8000/docs)
+ 
