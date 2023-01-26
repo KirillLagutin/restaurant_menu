@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from src.app.api.schemas import MenuBase, MenuDb
 from src.app.db.models import Base, Menu, Submenu, Dish
 from src.app.db.database import db, engine
-from uuid import UUID
+from uuid import UUID, uuid4
 
 Base.metadata.create_all(bind=engine)
 
@@ -35,6 +35,7 @@ def get_all_menus():
              status_code=status.HTTP_201_CREATED)
 def create_menu(menu: MenuBase):
     new_menu = Menu(
+        id=uuid4(),
         title=menu.title,
         description=menu.description,
     )

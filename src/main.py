@@ -3,6 +3,12 @@ from src.app.api.routes import menus, submenus, dishes
 
 app = FastAPI()
 
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
 app.include_router(
     menus.router,
     prefix="/api/v1/menus",

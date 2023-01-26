@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from uuid import UUID
+from uuid import UUID, uuid4
 
 
 # Menu
@@ -38,7 +38,7 @@ class SubmenuDb(SubmenuBase):
 class DishBase(BaseModel):
     title: str
     description: str
-    price: float = 0.0
+    price: str
 
 
 class DishDb(DishBase):

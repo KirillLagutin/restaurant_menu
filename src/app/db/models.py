@@ -12,11 +12,11 @@ class Menu(Base):
 
     id = Column(UUID(as_uuid=True),
                 primary_key=True,
-                index=True,
+                # index=True,
                 default=uuid.uuid4())
 
-    title = Column(String(30), index=True)
-    description = Column(String(90), index=True)
+    title = Column(String(30))
+    description = Column(String(90))
 
     submenus = relationship("Submenu",
                             backref="menu",

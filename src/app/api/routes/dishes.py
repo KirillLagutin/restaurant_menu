@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from src.app.api.schemas import DishBase, DishDb
 from src.app.db.models import Base, Submenu, Dish
 from src.app.db.database import db, engine
-from uuid import UUID
+from uuid import UUID, uuid4
 
 Base.metadata.create_all(bind=engine)
 
@@ -37,6 +37,7 @@ def create_dish(submenu_id: UUID, dish: DishBase):
                             detail=f"no submenu with id: {submenu_id}")
 
     new_dish = Dish(
+        id=uuid4(),
         title=dish.title,
         description=dish.description,
         price=dish.price,
